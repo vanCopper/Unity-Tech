@@ -97,7 +97,7 @@ Shader "Copper/CopperLit"
  
             // -------------------------------------
             // Unity defined keywords
-            #pragma multi_compile _ DIRLIGHTMAP_COMBINED
+            #pragma multi_compile _ DIRLIGHTMAP_COMBINED 
             #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile_fog
 
@@ -108,8 +108,12 @@ Shader "Copper/CopperLit"
             #pragma vertex LitPassVertex
             #pragma fragment LitPassFragment
 
+            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/LitInput.hlsl"
             #include "CopperLitForwardPass.hlsl"
             ENDHLSL
 		}
 	}
+
+    FallBack "Hidden/InternalErrorShader"
+    CustomEditor "UnityEditor.Rendering.LWRP.ShaderGUI.LitShader"
 }

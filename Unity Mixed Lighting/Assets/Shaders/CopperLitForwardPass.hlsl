@@ -1,5 +1,6 @@
 #ifndef COPPER_LIT_FORWARD_PASS_INCLUDED
 #define COPPER_LIT_FORWARD_PASS_INCLUDED
+
 #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Lighting.hlsl"
 
 struct Attributes
