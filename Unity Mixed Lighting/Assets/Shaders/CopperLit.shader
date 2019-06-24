@@ -51,6 +51,9 @@ Shader "Copper/CopperLit"
         [HideInInspector] _GlossMapScale("Smoothness", Float) = 0.0
         [HideInInspector] _Glossiness("Smoothness", Float) = 0.0
         [HideInInspector] _GlossyReflections("EnvironmentReflections", Float) = 0.0
+
+        //Custom 
+        [Toggle(_CHECKER_ON)]_CHECKER_ON("Checker On", Float) = 0
     }
 
 	SubShader 
@@ -104,6 +107,9 @@ Shader "Copper/CopperLit"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+
+            //Custom 
+            #pragma shader_feature _CHECKER_ON
             
             #pragma vertex LitPassVertex
             #pragma fragment LitPassFragment
@@ -112,8 +118,102 @@ Shader "Copper/CopperLit"
             #include "CopperLitForwardPass.hlsl"
             ENDHLSL
 		}
+
+        Pass
+        {
+            Name "ShadowCaster"
+            Tags{"LightMode" = "ShadowCaster"}
+
+            ZWrite On
+            ZTest LEqual
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature _ALPHATEST_ON
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+
+            #pragma vertex ShadowPassVertex
+            #pragma fragment ShadowPassFragment
+
+            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/LitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/ShadowCasterPass.hlsl"
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "DepthOnly"
+            Tags{"LightMode" = "DepthOnly"}
+
+            ZWrite On
+            ColorMask 0
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthOnlyVertex
+            #pragma fragment DepthOnlyFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature _ALPHATEST_ON
+            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+
+            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/LitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/DepthOnlyPass.hlsl"
+            ENDHLSL
+        }
+
+        // This pass it not used during regular rendering, only for lightmap baking.
+        Pass
+        {
+            Name "Meta"
+            Tags{"LightMode" = "Meta"}
+
+            Cull Off
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+
+            #pragma vertex LightweightVertexMeta
+            #pragma fragment LightweightFragmentMeta
+
+            #pragma shader_feature _SPECULAR_SETUP
+            #pragma shader_feature _EMISSION
+            #pragma shader_feature _METALLICSPECGLOSSMAP
+            #pragma shader_feature _ALPHATEST_ON
+            #pragma shader_feature _ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+
+            #pragma shader_feature _SPECGLOSSMAP
+
+            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/LitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/LitMetaPass.hlsl"
+
+            ENDHLSL
+        }
 	}
 
     FallBack "Hidden/InternalErrorShader"
-    CustomEditor "UnityEditor.Rendering.LWRP.ShaderGUI.LitShader"
+    CustomEditor "CopperLitShader"
 }

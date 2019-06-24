@@ -74,6 +74,18 @@ void InitializeInputData(Varyings input, half3 normalTS, out InputData inputData
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//                  Custom Functions                            //
+///////////////////////////////////////////////////////////////////////////////
+
+float GenChecker(float2 uv)
+{
+    float2 repeatUV = uv*10;
+    float2 c = floor(repeatUV) / 2;
+    float checker = frac(c.x + c.y) * 2;
+    return checker;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 //                  Vertex and Fragment functions                            //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -107,7 +119,7 @@ Varyings LitPassVertex(Attributes input)
     OUTPUT_SH(output.normalWS.xyz, output.vertexSH);
 
     output.fogFactorAndVertexLight = half4(fogFactor, vertexLight);
-
+ 
 #ifdef _ADDITIONAL_LIGHTS
     output.positionWS = vertexInput.positionWS;
 #endif
@@ -136,7 +148,18 @@ half4 LitPassFragment(Varyings input) : SV_Target
     half4 color = LightweightFragmentPBR(inputData, surfaceData.albedo, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.occlusion, surfaceData.emission, surfaceData.alpha);
 
     color.rgb = MixFog(color.rgb, inputData.fogCoord);
-    return color;
+
+    half4 final_color;
+    #ifdef _CHECKER_ON
+        float checkCol = GenChecker(input.uv);
+        final_color = color * checkCol;
+    #else
+        final_color = color;
+    #endif
+
+    return final_color;
 }
+
+
 
 #endif
