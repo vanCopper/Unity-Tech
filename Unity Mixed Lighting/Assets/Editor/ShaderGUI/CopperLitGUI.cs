@@ -28,7 +28,7 @@ public class CopperLitShader : BaseShaderGUI
 
         SetMaterialKeywords(material, LitGUI.SetMaterialKeywords);
         //TODO: vanCopper
-        CoreUtils.SetKeyword(material, "_CHECKER_ON", material.GetFloat("_CHECKER_ON") == 0.0f);
+        CoreUtils.SetKeyword(material, "_CHECKER_ON", material.GetFloat("_CHECKER_ON") == 1.0f);
         material.SetFloat("_CHECKER_ON", checkerProperty.floatValue);
     }
 
