@@ -57,8 +57,8 @@ Unity中有三种灯光模式：Realtime Lighting，Mixed Lighting，Bake Lighti
 |                 | 动态对象 Receiver  |                    | 静态对象 Receiver  |                    |
 | :-------------: | :----------------: | :----------------: | :----------------: | :----------------: |
 |                 | Shadow Distance 内 | Shadow Distance 外 | Shadow Distance 内 | Shadow Distance 外 |
-| 动态对象 Caster |      实时阴影      |         无         |      实时阴影      |         无         |
-| 静态对象 Caster |      实时阴影      |         无         |      实时阴影      |         无         |
+| 动态对象 Caster |     Shadow map     |         无         |     Shadow map     |         无         |
+| 静态对象 Caster |     Shadow map     |         无         |     Shadow map     |         无         |
 
 实时光照 : 
 
@@ -81,11 +81,11 @@ Bake Indirect模式优点是有实时阴影，有间接光照，缺点也很明�
 
 ##### 阴影
 
-|                 | 动态对象 Receiver  |                    | 静态对象 Receiver  |                    |
-| :-------------: | :----------------: | :----------------: | :----------------: | :----------------: |
-|                 | Shadow Distance 内 | Shadow Distance 外 | Shadow Distance 内 | Shadow Distance 外 |
-| 动态对象 Caster |      实时阴影      |         无         |      实时阴影      |         无         |
-| 静态对象 Caster |    Light Probes    |    Light Probes    |      Lightmap      |      Lightmap      |
+|                 | 动态对象 Receiver  |                    |   静态对象 Receiver   |                    |
+| :-------------: | :----------------: | :----------------: | :-------------------: | :----------------: |
+|                 | Shadow Distance 内 | Shadow Distance 外 |  Shadow Distance 内   | Shadow Distance 外 |
+| 动态对象 Caster |     Shadow map     |         -          | Main light shadow map |         -          |
+| 静态对象 Caster |    Light Probes    |    Light Probes    |       Lightmap        |      Lightmap      |
 
 ![](./images/Mix_03.gif)
 
@@ -123,11 +123,13 @@ half3 SubtractDirectMainLightFromLightmap(Light mainLight, half3 normalWS, half3
 }
 ```
 
-看最后一句就是谁黑选谁，所以可以在`Mixed Lighting->Realtime Shadow Color`中将实时阴影的颜色设置为接近烘焙阴影。调整后：
+`_SubtractiveShadowColor`就是在`Mixed Lighting->Realtime Shadow Color`中设置的用于控制场景阴影整体颜色的参数。调整后：
 
 ![](./images/Mix_04.gif)
 
-注意看阴影的部分。**Subtractive**模式静态物体效果很好，并且阴影是直接烘焙在Lightmap中，阴影的渲染直接从Lightmap采样即可，节省性能。不好的地方是动态阴影与静态阴影的混合存在问题。
+注意看阴影的部分。
+
+**Subtractive**模式静态物体效果很好，并且阴影是直接烘焙在Lightmap中，阴影的渲染直接从Lightmap采样即可，节省性能。不好的地方是动态阴影与静态阴影的混合存在问题。
 
 ### Shadowmask
 
@@ -140,4 +142,6 @@ half3 SubtractDirectMainLightFromLightmap(Light mainLight, half3 normalWS, half3
 >http://ma-yidong.com/2017/09/02/mixed-lighting-lightmap-shader-in-unity/
 >
 >https://zhuanlan.zhihu.com/p/34477578
+>
+>https://docs.unity3d.com/Manual/LightMode-Mixed-Subtractive.html
 
