@@ -157,7 +157,14 @@ half4 LitPassFragment(Varyings input) : SV_Target
         final_color = color;
     #endif
 
+    // #if defined(SHADOWS_SHADOWMASK)
+    //     #if defined(LIGHTMAP_ON)
+    //         final_color += SampleBakedOcclusion(input.lightmapUV, input.positionWS);
+    //     #endif
+    // #endif
     return final_color;
+
+    // return SampleBakedOcclusion(input.uv, inputData.positionWS);
 }
 
 

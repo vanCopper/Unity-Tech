@@ -12,7 +12,7 @@ Unity中有三种灯光模式：Realtime Lighting，Mixed Lighting，Bake Lighti
 
 其中Mixed Lighting较为复杂，因为处理实时灯光的同时还需要考虑烘焙出来的Lightmap的使用，Shader也更为复杂。Mixed Lighting又有三种模式：Bake Indirect, Subtractive, ShadowMask。
 
-测试环境使用的LWRP，LWRP（6.5.3）中当前管线只支持**Subtractive**模式，故我修改了LWRP的部分代码，以开启另外两种模式的Mixed Lighting。
+测试环境使用的LWRP，LWRP（6.5.3）中当前管线只支持**Subtractive**模式，我修改了LWRP的部分代码，以开启另外两种模式的Mixed Lighting。
 
 `LightweightRenderPipeline.cs`
 
@@ -133,7 +133,20 @@ half3 SubtractDirectMainLightFromLightmap(Light mainLight, half3 normalWS, half3
 
 ### Shadowmask
 
+##### 光照 （Shadowmask 不使用Distance Shadowmask模式 ）
 
+|          | 直接光 | 间接光     |
+| :------: | ------ | ---------- |
+| 动态对象 | 实时光 | LightProbe |
+| 静态对象 | 实时光 | Lightmap   |
+
+##### 阴影（Shadowmask 不使用Distance Shadowmask模式）
+
+|                 | 动态对象 Receiver  |                    | 静态对象 Receiver  |                    |
+| :-------------: | :----------------: | :----------------: | :----------------: | :----------------: |
+|                 | Shadow Distance 内 | Shadow Distance 外 | Shadow Distance 内 | Shadow Distance 外 |
+| 动态对象 Caster |     Shadow map     |         -          |     Shadow map     |         -          |
+| 静态对象 Caster |    Light Probes    |    Light Probes    |     Shadowmask     |     Shadowmask     |
 
 ### Ref
 
