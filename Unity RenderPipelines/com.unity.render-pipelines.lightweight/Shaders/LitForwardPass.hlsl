@@ -136,5 +136,4 @@ half4 LitPassFragment(Varyings input) : SV_Target
     color.rgb = MixFog(color.rgb, inputData.fogCoord);
     return color;
 }
-
 #endif

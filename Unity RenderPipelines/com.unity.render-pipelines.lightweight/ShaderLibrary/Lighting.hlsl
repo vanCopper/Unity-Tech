@@ -428,20 +428,6 @@ half3 GlobalIllumination(BRDFData brdfData, half3 bakedGI, half occlusion, half3
     return EnvironmentBRDF(brdfData, indirectDiffuse, indirectSpecular, fresnelTerm);
 }
 
-half SampleBakedOcclusion(float2 lightmapUV, float3 worldPos)
-{
-    #if defined(SHADOWS_SHADOWMASK)
-        #if defined(LIGHTMAP_ON)
-            fixed4 rawOcclusionMask = UNITY_SAMPLE_TEX2D_SAMPLER(unity_ShadowMask, unity_Lightmap, lightmapUV.xy);
-        #else
-           fixed4 rawOcclusionMask = UNITY_SAMPLE_TEX2D(unity_ShadowMask, lightmapUV.xy);
-        #endif
-        return saturate(dot(rawOcclusionMask, unity_OcclusionMaskSelector));
-    #else
-        return 1.0;
-    #endif
-}
-
 void MixRealtimeAndBakedGI(inout Light light, half3 normalWS, inout half3 bakedGI, half4 shadowMask)
 {
 #if defined(_MIXED_LIGHTING_SUBTRACTIVE) && defined(LIGHTMAP_ON)

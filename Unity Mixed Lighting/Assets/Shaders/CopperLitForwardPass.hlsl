@@ -1,7 +1,9 @@
 #ifndef COPPER_LIT_FORWARD_PASS_INCLUDED
 #define COPPER_LIT_FORWARD_PASS_INCLUDED
 
+#include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Input.hlsl"
 #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Lighting.hlsl"
+
 
 struct Attributes
 {
@@ -38,6 +40,7 @@ struct Varyings
 #endif
 
     float4 positionCS               : SV_POSITION;
+    float3 worldPos                 : TEXCOORD8;
     UNITY_VERTEX_INPUT_INSTANCE_ID
     UNITY_VERTEX_OUTPUT_STEREO
 };
@@ -85,6 +88,21 @@ float GenChecker(float2 uv)
     return checker;
 }
 
+sampler2D _ShadowMask;
+half SampleBakedOcclusion(float2 lightmapUV, float3 worldPos)
+{
+    float4 rawOcclusionMask = 0.0;
+    // #if defined(SHADOWS_SHADOWMASK)
+    #if defined(LIGHTMAP_ON)
+        rawOcclusionMask = tex2D(_ShadowMask, lightmapUV.xy);
+    #endif
+
+    return rawOcclusionMask.r;
+    // #else
+    //     return 1.0;
+    // #endif
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //                  Vertex and Fragment functions                            //
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,7 +147,7 @@ Varyings LitPassVertex(Attributes input)
 #endif
 
     output.positionCS = vertexInput.positionCS;
-
+    output.worldPos = vertexInput.positionWS;
     return output;
 }
 
@@ -145,6 +163,10 @@ half4 LitPassFragment(Varyings input) : SV_Target
     InputData inputData;
     InitializeInputData(input, surfaceData.normalTS, inputData);
 
+    // #if defined(LIGHTMAP_ON)
+    //     inputData.bakedGI = (SampleBakedOcclusion(input.lightmapUV.xy,input.worldPos.xyz));
+    // #endif
+
     half4 color = LightweightFragmentPBR(inputData, surfaceData.albedo, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.occlusion, surfaceData.emission, surfaceData.alpha);
 
     color.rgb = MixFog(color.rgb, inputData.fogCoord);
@@ -157,14 +179,10 @@ half4 LitPassFragment(Varyings input) : SV_Target
         final_color = color;
     #endif
 
-    // #if defined(SHADOWS_SHADOWMASK)
-    //     #if defined(LIGHTMAP_ON)
-    //         final_color += SampleBakedOcclusion(input.lightmapUV, input.positionWS);
-    //     #endif
-    // #endif
-    return final_color;
+    
 
-    // return SampleBakedOcclusion(input.uv, inputData.positionWS);
+    return final_color;
+    // return SampleBakedOcclusion(input.lightmapUV.xy, input.worldPos.xyz);
 }
 
 

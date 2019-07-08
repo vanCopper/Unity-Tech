@@ -32,6 +32,8 @@ Shader "Copper/CopperLit"
         _EmissionColor("Color", Color) = (0,0,0)
         _EmissionMap("Emission", 2D) = "white" {}
 
+        // [HideInInspector] _ShadowMask("_ShadowMask", 2D) = "white"{}
+
         // Blending state
         [HideInInspector] _Surface("__surface", Float) = 0.0
         [HideInInspector] _Blend("__blend", Float) = 0.0
@@ -102,6 +104,7 @@ Shader "Copper/CopperLit"
             // Unity defined keywords
             #pragma multi_compile _ DIRLIGHTMAP_COMBINED 
             #pragma multi_compile _ LIGHTMAP_ON
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
             #pragma multi_compile_fog
 
             //--------------------------------------
