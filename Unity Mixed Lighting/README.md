@@ -135,7 +135,7 @@ half3 SubtractDirectMainLightFromLightmap(Light mainLight, half3 normalWS, half3
 
 该模式下会多出一张**Shadowmask**的图，该图可存储4个灯光产生的阴影。
 
-
+![](./images/Mix_05.jpg)
 
 ##### 光照 （Shadowmask 不使用Distance Shadowmask模式 ）
 
@@ -152,7 +152,22 @@ half3 SubtractDirectMainLightFromLightmap(Light mainLight, half3 normalWS, half3
 | 动态对象 Caster |     Shadow map     |         -          | Main light shadow map |         -          |
 | 静态对象 Caster |    Light Probes    |    Light Probes    |      Shadowmask       |     Shadowmask     |
 
+将**Quality->Shadows->Shadowmask Mode->Distance Shadowmask**
 
+##### 光照(Shadowmask 使用 Distance Shadowmask模式)
+
+|          | 直接光 |   间接光   |
+| :------: | :----: | :--------: |
+| 动态对象 | 实时光 | LightProbe |
+| 静态对象 | 实时光 |  Lightmap  |
+
+##### 阴影(Shadowmask 使用 Distance Shadowmask模式)
+
+|                 | 动态对象 Receiver  |                    |   静态对象 Receiver   |                    |
+| :-------------: | :----------------: | :----------------: | :-------------------: | :----------------: |
+|                 | Shadow Distance 内 | Shadow Distance 外 |  Shadow Distance 内   | Shadow Distance 外 |
+| 动态对象 Caster |     Shadow map     |         /          | Main light shadow map |         /          |
+| 静态对象 Caster |     Shadow map     |    Light Probes    | Main light shadow map |     Shadowmask     |
 
 ### Ref
 
